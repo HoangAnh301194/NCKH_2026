@@ -60,19 +60,15 @@
 
 #### Kết quả khảo sát sơ bộ — 5 công trình liên quan nhất đến CNN/YOLO và ước lượng góc tuần hoàn
 
-**Tiêu chí lựa chọn:** Ưu tiên (i) xử lý tính tuần hoàn của góc, (ii) phân lớp góc có nhãn mềm kết hợp object detection, (iii) khả năng dự đoán **heading có hướng 360°**, và (iv) giá trị làm baseline cho dự án Leanbot. Danh sách gồm **3 công trình nền tảng/đối chứng trực tiếp** và **2 công trình bổ sung về triển khai/cải tiến**; không chọn theo năm công bố đơn thuần.
-
-> **Phân biệt bài toán:** CSL/YOLO-CSL/adaptive angle classification chủ yếu dự đoán góc của *rotated bounding box* (OBB, có thể chỉ quy ước trong 90°/180°). Leanbot cần **directed heading 360°**, phân biệt đầu và đuôi robot. Vì thế **mAP OBB không thể so trực tiếp với circular MAE của Leanbot**. \"Chưa giải quyết\" bên dưới chỉ nói về phạm vi/thí nghiệm được công bố, **không mặc nhiên chứng minh research gap chưa từng được nghiên cứu**.
->
-> **Xếp hạng:** SJR và JCR là hai chuẩn **khác nhau**, thay đổi theo năm và *subject category*. Dùng mốc **2025** (năm xếp hạng, không phải năm xuất bản bài báo); số liệu quartile lấy từ khảo sát trước, cần đối chiếu nguồn chính thức khi sử dụng trong bài báo.
+> **Phân biệt bài toán:** CSL/YOLO-CSL/adaptive angle classification chủ yếu dự đoán góc của *rotated bounding box* (OBB, có thể chỉ quy ước trong 90°/180°). Tuy nhiên bài toán Leanbot là **directed heading 360°**, phân biệt đầu và đuôi robot. Vì thế **mAP OBB không thể so trực tiếp với circular MAE của Leanbot**. 
 
 ##### 1. Arbitrary-Oriented Object Detection with Circular Smooth Label — ECCV 2020
 
 - **Thông tin bài báo:** Xue Yang, Junchi Yan; *European Conference on Computer Vision (ECCV 2020)*, LNCS 12353, tr. 677–694. Hội nghị, **không áp dụng Q tạp chí SJR/JCR**. [Trang công bố](https://www.ecva.net/papers/eccv_2020/papers_ECCV/html/666_ECCV_2020_paper.php) · [DOI](https://doi.org/10.1007/978-3-030-58598-3_40).
 - **Bài toán và phương pháp:** Xử lý sự gián đoạn khi hồi quy góc OBB qua biên chu kỳ: thay angle regression bằng **angle classification**, thêm **Circular Smooth Label (CSL)** để các lớp góc lân cận có nhãn mềm tuần hoàn; khảo sát hàm cửa sổ (bao gồm Gaussian) và độ rộng cửa sổ.
 - **Kết quả/đối chứng:** Đánh giá các detector/biểu diễn góc, ảnh hưởng window và radius trên **DOTA, HRSC2016, ICDAR2015, MLT**; chứng minh khả năng khắc phục lỗi biên trong rotated detection. Không báo cáo trực tiếp sai số directed heading 360° cho robot.
-- **So với Leanbot:** **Có:** lớp góc rời rạc, khoảng cách góc tuần hoàn, Gaussian soft targets — rất gần **Soft Angular BCE**. **Chưa có trong bài:** 24 class biểu diễn hướng đầu–đuôi robot 360°, tổng hợp raw class scores trước NMS để suy ra góc liên tục, và thí nghiệm vài trăm ảnh.
-- **Vai trò khi viết báo:** **Bắt buộc trích dẫn (prior work) + baseline loss:** đối chiếu **YOLO11n hard BCE** với **circular soft-label BCE/CSL** trên cùng bộ ảnh Leanbot. **Không được tuyên bố Gaussian circular soft labels là phát minh hoàn toàn mới.**
+- **So với Leanbot:** **Có:** lớp góc rời rạc, khoảng cách góc tuần hoàn, Gaussian soft targets — rất gần **Soft Angular BCE** mà em sử dụng . **Chưa có đề cập trong bài:** 24 class biểu diễn hướng đầu–đuôi robot 360°, tổng hợp raw class scores trước NMS để suy ra góc liên tục, và thí nghiệm vài trăm ảnh.
+- **Có thể sử dụng để:** trích dẫn (prior work) + baseline loss:** đối chiếu **YOLO11n hard BCE** với **circular soft-label BCE/CSL** trên cùng bộ ảnh Leanbot. 
 
 ##### 2. Detection of Objects in Satellite and Aerial Imagery Using Channel and Spatially Attentive YOLO-CSL for Surveillance — 2024
 
@@ -80,15 +76,14 @@
 - **Bài toán và phương pháp:** Phát hiện vật thể quay trong ảnh viễn thám; tích hợp **YOLOv5 + nhánh dự đoán góc riêng**, **Circular Smooth Labels + BCEWithLogits** và channel/spatial attention.
 - **Kết quả/đối chứng:** Tác giả báo cáo **mAP 57,86 trên DOTA-v2**, cao hơn phương pháp đứng thứ hai trong bảng so sánh **0,20 điểm mAP**; mô hình khoảng **25 triệu tham số, 54 GFLOPs**. Đây là mAP detection OBB, không phải sai số heading.
 - **So với Leanbot:** **Có:** YOLO + phân loại góc + nhãn mềm tuần hoàn + BCE — **rất gần thiết kế thuật toán**. **Khác:** dùng *angle branch* riêng cho OBB, còn Leanbot mã hóa 24 hướng đầu robot thành detection classes và dùng **weighted circular mean** trên scores; không đánh giá bài toán tracking/heading robot 360°.
-- **Vai trò khi viết báo:** **Ưu tiên trích dẫn rất cao (prior work sát nhất về YOLO + CSL + BCE)**. Có thể thiết kế **baseline YOLO + angle branch** hoặc, tối thiểu, đối chứng nhãn cứng/nhãn mềm trong cùng YOLO11n. Không so mAP DOTA-v2 với circular MAE Leanbot.
-
+- **Vai trò sử dụng khi viết báo:** **có thể là lựa chọn trích dẫn cao (prior work sát nhất về YOLO + CSL + BCE)**. Có thể thiết kế **baseline YOLO + angle branch** hoặc, tối thiểu, đối chứng nhãn cứng/nhãn mềm trong cùng YOLO11n. 
 ##### 3. Biternion Nets: Continuous Head Pose Regression from Discrete Training Labels — GCPR 2015
 
 - **Thông tin bài báo:** Lucas Beyer, Alexander Hermans, Bastian Leibe; *German Conference on Pattern Recognition (GCPR 2015)*, LNCS 9358, tr. 157–168. Hội nghị, **không áp dụng Q tạp chí SJR/JCR**. [Trang tác giả và mã nguồn](https://www.vision.rwth-aachen.de/publication/0021/) · [DOI](https://doi.org/10.1007/978-3-319-24947-6_13).
 - **Bài toán và phương pháp:** Dự đoán **góc hướng liên tục 360°** khi nhãn training chỉ là các góc thô/rời rạc, tránh gián đoạn tại 0°/360°; CNN hồi quy trực tiếp **biternion \((\cos\theta,\sin\theta)\)** thay vì chia góc thành nhiều classes.
-- **Kết quả/đối chứng:** So sánh các mô hình hồi quy/phân loại trên nhiều bộ dữ liệu hướng đầu; báo cáo hiệu quả của biternion từ coarse labels. **Chưa đưa số MAE vì cần đọc đúng bảng và cách chia tập trong bài gốc**.
+- **Kết quả/đối chứng:** So sánh các mô hình hồi quy/phân loại trên nhiều bộ dữ liệu hướng đầu; báo cáo hiệu quả của biternion từ coarse labels.
 - **So với Leanbot:** **Có:** directed orientation 360°, nhãn góc thưa, đầu ra liên tục, không đòi gán nhãn keypoint. **Khác:** không phải detector YOLO tích hợp class heading và không dùng Soft Angular BCE, pre-NMS scores hay vòng điều khiển Leanbot.
-- **Vai trò khi viết báo:** **Baseline ước lượng góc bắt buộc:** huấn luyện **CNN/YOLO ROI backbone + sin/cos head** trên **cùng train/test split** với 24-class Soft Angular BCE; so **circular MAE, lỗi vùng biên 0°/360°, chi phí dữ liệu**. Đây là so sánh có ý nghĩa khoa học hơn trích riêng mAP OBB.
+- **Vai trò sử dụng khi viết báo:** **Baseline ước lượng góc bắt buộc:** huấn luyện **CNN/YOLO ROI backbone + sin/cos head** trên **cùng train/test split** với 24-class Soft Angular BCE; so sánh và đánh giá bằng các metric **circular MAE, lỗi vùng biên 0°/360°, chi phí dữ liệu** để lấy dữ liệu so sánh độ hiệu quả của của phương pháp đề xuất .
 
 ##### 4. A Deep Learning Framework for Accurate Vehicle Yaw Angle Estimation from a Monocular Camera Based on Part Arrangement — 2022
 
@@ -96,7 +91,7 @@
 - **Bài toán và phương pháp:** Ước lượng **yaw của xe có hướng** từ một camera RGB; mạng **YAEN** gồm bộ mã hóa sắp xếp bộ phận xe (đầu/đuôi, đèn, gương...) và CNN decoder để dự đoán yaw. Không phụ thuộc rotated-box angle classification.
 - **Kết quả/đối chứng:** Trên dữ liệu thực đo của tác giả, **sai số trung bình dưới 3,1°**, **96,45% dự đoán có sai số dưới 10°**, **97 FPS trên RTX 2070 Super**; kết quả có điều kiện về quan sát/bị che khuất và không tái sử dụng trực tiếp cho Leanbot.
 - **So với Leanbot:** **Có:** bài toán heading/yaw trực tiếp, monocular camera, mô hình CNN gọn, đánh giá sai số góc thực. **Khác:** cần thông tin/học các **bộ phận xe** thay vì nhãn bbox+góc robot; dữ liệu/thành phần hình học khác, không khai thác 24 class scores và weighted circular mean.
-- **Vai trò khi viết báo:** **Trích dẫn cao — Related Work heading bằng monocular CNN, tham khảo cách thu ground truth và thước đo sai số**. Baseline part-based là **tùy chọn** nếu Leanbot có đặc trưng đầu–đuôi đủ rõ; không bắt buộc tái hiện toàn bộ YAEN.
+- **Vai trò có thể sử dụng khi viết báo:** **Trích dẫn cao — Related Work heading bằng monocular CNN, tham khảo cách thu ground truth và thước đo sai số**. 
 
 ##### 5. Rotated Object Detection Using Adaptive Angle Classification and Dynamic Sample Matching — 2026
 
@@ -104,11 +99,11 @@
 - **Bài toán và phương pháp:** Đối tượng quay trong viễn thám/ký tự công nghiệp; cải tiến YOLOv8 bằng **shape-aware adaptive angle classification (SA-ASL)** với **circular Gaussian window có độ rộng phụ thuộc hình dạng đối tượng** và progressive dynamic matching (hIoU → rIoU).
 - **Kết quả/đối chứng:** **mAP 78,6% trên DOTA**, **92,4% trên tập ký tự công nghiệp**; ablation báo cáo tăng **4,3% ở nhóm lớp nhạy với góc** nhờ angle classification thích nghi (theo tác giả). Không phải thí nghiệm directed heading 360°.
 - **So với Leanbot:** **Có:** nhãn mềm Gaussian tuần hoàn, YOLO, quan tâm độ bất định theo góc. **Khác:** độ rộng nhãn **thích nghi** theo tỷ lệ box thay vì \(\sigma=15^\circ\) cố định; giải góc OBB và ghép mẫu rIoU, không xử lý class heading và circular-mean scores như Leanbot.
-- **Vai trò khi viết báo:** **Trích dẫn cao — prior work mới (2026) + gợi ý ablation**: thử \(\sigma\) cố định so với thay đổi; cân nhắc uncertainty-aware target. **Không nên sao chép shape-adaptive σ nếu chưa có giả thuyết phù hợp**, vì kích thước/độ vuông bbox của Leanbot có thể không phản ánh bất định heading.
+- **Vai trò có thể sử dụng khi viết báo:** **Trích dẫn — prior work mới (2026) + gợi ý ablation**: thử \(\sigma\) cố định so với thay đổi; cân nhắc uncertainty-aware target.
 
-**Kết luận khảo sát:** (1) CSL đã giải quyết **tính tuần hoàn của các lớp góc**; (2) YOLO-CSL chứng minh **YOLO + CSL + BCE không phải mới**; (3) Biternion chứng minh có thể **ước lượng góc liên tục 360° từ nhãn thưa**; (4) YAEN là prior work trực tiếp về **camera monocular + yaw có hướng**; (5) nghiên cứu năm 2026 cho thấy circular soft labels vẫn được cải tiến (adaptive widths). **Chưa đủ cơ sở khẳng định pipeline Leanbot tối ưu hoặc có novelty chỉ nhờ kết hợp các kỹ thuật trên.**
+**Kết luận khảo sát sơ bộ:** (1) CSL đã giải quyết **tính tuần hoàn của các lớp góc**; (2) YOLO-CSL chứng minh **YOLO + CSL + BCE không còn là phương pháp mới**; (3) Biternion chứng minh có thể **ước lượng góc liên tục 360° từ nhãn thưa**; (4) YAEN là prior work trực tiếp về **camera monocular + yaw có hướng**; (5) nghiên cứu năm 2026 cho thấy circular soft labels vẫn được cải tiến (adaptive widths). 
 
-**Benchmark ngắn hạn nên làm:** Giữ cùng bộ dữ liệu Leanbot với ground truth góc độc lập và tách train/test theo session: **(A)** YOLO11n + hard-label BCE + argmax; **(B)** YOLO11n + Soft Angular BCE + argmax; **(C)** YOLO11n + Soft Angular BCE + weighted circular mean; **(D)** sin/cos regression (Biternion baseline). Báo cáo **circular MAE**, lỗi tại biên 0°/360°, latency; thêm ablation \(\sigma\) khi có kết quả nền. Không so trực tiếp chỉ số từ các bộ dữ liệu/phần cứng khác nhau.
+**Benchmark có thể thực nghiệm để đánh giá phương pháp đề xuất và phương pháp của các bài báo có thể như sau :** Giữ cùng bộ dữ liệu Leanbot với ground truth góc độc lập và tách train/test theo session: **(A)** YOLO11n + hard-label BCE + argmax; **(B)** YOLO11n + Soft Angular BCE + argmax; **(C)** YOLO11n + Soft Angular BCE + weighted circular mean; **(D)** sin/cos regression (Biternion baseline). Báo cáo **circular MAE**, lỗi tại biên 0°/360°, latency; thêm ablation \(\sigma\) khi có kết quả nền. Không so trực tiếp chỉ số từ các bộ dữ liệu/phần cứng khác nhau.
 
 ### 2. Toàn bộ hệ thống của bài toán (tính ứng dụng)
 - Tối ưu bài toán cho hệ thống máy chủ tính toán yếu : 
@@ -120,8 +115,9 @@
     - Hệ thống giao tiếp, điều khiển thôgn qua BLE communication với thiết bị chấp hành ( Leanbot )
 
 ## C. Khó khăn
-- Không
+- Sau khi khảo sát kĩ hơn thì em thấy hướng này không phải là hướng mới hoàn toàn, đã có nhiều nghiên cứu trước đó đã áp dụng CNN và một số phương pháp tương đối giống về mặt ý tưởng . 
+- Tuy nhiên mỗi bài báo sẽ có hạn chế riêng , em nghĩ với bài toán đặc thù của Leanbot thì chắc có thể vẫn sẽ tìm được một vài khoảng trống nghiên cứu nào đó để cải tiến những hạn chế cũ ạ.
+- Ngoài ra em nghĩ cũng có thể viết bài dạng so sánh các phương pháp đã có với phương pháp mình đề xuất với bài toán đặc thù riêng của mình ạ . 
 ## D. Công việc tiếp theo
 - Khảo sát sâu thêm về các bài báo liên quan tới nội dung Orientation Estimation base-on CNN Architecture 
-- Chạy lại thực nghiệm và thu thập dữ liệu với góc quay xác thực để lấy kết quả đánh giá, so sánh với các bài báo đã khảo sát 
 - Em xin phép nhận thêm ý kiến , đề xuất hướng đi tiếp theo ạ .
