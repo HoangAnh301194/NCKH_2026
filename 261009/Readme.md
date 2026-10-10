@@ -60,59 +60,59 @@
 
 **Kết quả khảo sát sơ bộ về CNN/YOLO và ước lượng góc tuần hoàn**
 
-*Lưu ý:* Các công trình YOLO dưới đây chủ yếu đánh giá góc của **rotated bounding box (OBB)**, thường mang tính đối xứng 180°, còn Leanbot cần **directed heading 360°**. Chỉ số mAP của OBB không phải sai số góc (MAE). Xếp hạng SJR được xem theo năm/ngành và cần đối chiếu tại thời điểm nộp bài.
+*Lưu ý:* Các công trình YOLO dưới đây chủ yếu đánh giá góc của **rotated bounding box (OBB)**, thường mang tính đối xứng 180°, còn Leanbot cần **directed heading 360°**. Chỉ số mAP của OBB không phải sai số góc (MAE). **Các quartile dưới đây dùng dữ liệu năm 2025:** **SJR** = phân hạng SCImago dựa trên Scopus; **JCR (JIF quartile)** = phân hạng Journal Citation Reports của Clarivate dựa trên Web of Science. Một tạp chí có thể thuộc nhiều ngành với Q khác nhau. JCR 2025 được phát hành năm 2026. Không đồng nhất SJR Q với Scopus CiteScore Q hay JCR Q; các xếp hạng bên dưới có liên kết nguồn kiểm tra. Nếu không có dữ liệu JCR đáng tin cậy thì ghi rõ thay vì suy đoán.
 
 **1. Rotated Object Detection Using Adaptive Angle Classification and Dynamic Sample Matching (2026)**
-- **Xuất bản:** Liu Han và cộng sự, *Chinese Journal of Engineering*, 48(3), 586–598 (2026). [DOI](https://doi.org/10.13374/j.issn2095-9389.2025.06.09.006). Quartile: **cần xác minh theo SJR/JCR và ngành**.
+- **Xuất bản:** Liu Han và cộng sự, *Chinese Journal of Engineering*, 48(3), 586–598 (2026). [DOI](https://doi.org/10.13374/j.issn2095-9389.2025.06.09.006). **SJR 2025: Q2** (*Engineering*; SJR ≈ 0,386). **JCR 2025: Không có JIF quartile được xác nhận** (chưa ghi nhận trong WoS Core Collection). [SJR/coverage](https://journalindexes.com/gongcheng-kexue-xuebao-chinese-journal-of-engineering-20959389/) · [Nhà xuất bản](https://journal.ustb.edu.cn/Journals/index.htm).
 - **Bài toán:** Phát hiện đối tượng quay trong ảnh viễn thám, giảm sai số gián đoạn góc và cải thiện matching đối tượng.
 - **Phương pháp:** YOLOv8, *shape-aware adaptive angle classification* dùng nhãn mềm Gaussian tuần hoàn với độ rộng điều chỉnh theo tỷ lệ hình dạng; thêm dynamic sample matching.
 - **Kết quả:** Tác giả báo cáo mAP **78,6% trên DOTA** và **92,4% trên dữ liệu ký tự công nghiệp**; đây là chỉ số phát hiện OBB, không phải heading MAE.
 - **Liên hệ:** Gần Soft Angular BCE của Leanbot; đáng kiểm tra việc dùng \(\sigma\) cố định so với thích nghi.
 
 **2. ODC-YOLO: An Optimized YOLOv5 Method for Detecting Objects in Remote Sensing Images (2025)**
-- **Xuất bản:** Qing Liu và cộng sự, *Remote Sensing Letters*, 16(10), 1120–1130 (2025). [DOI](https://doi.org/10.1080/2150704X.2025.2529599). Quartile: **cần đối chiếu nguồn SJR theo năm**.
+- **Xuất bản:** Qing Liu và cộng sự, *Remote Sensing Letters*, 16(10), 1120–1130 (2025). [DOI](https://doi.org/10.1080/2150704X.2025.2529599). **SJR 2025: Q2** (*Electrical and Electronic Engineering*, SJR ≈ 0,434). **JCR 2025: Q4** (*Remote Sensing* và *Imaging Science & Photographic Technology*, JIF 1,5). [SJR](https://www.journalsbase.com/journals/remote-sensing-letters) · [JCR 2025](https://apa.letpub.com/index.php?journalid=8680&page=journalapp&view=detail). **Lưu ý:** Một số trang vẫn hiển thị **JCR Q3 năm 2024**, không phải năm 2025.
 - **Bài toán:** Phát hiện vật thể nhỏ, hướng quay bất kỳ, phân bố dày đặc trong ảnh viễn thám.
 - **Phương pháp:** Cải tiến YOLOv5 bằng ODConv/Res2Net, M-RFB và Circular Smooth Labels (CSL) cho góc của box.
 - **Kết quả:** Tác giả báo cáo cải thiện **3,45 điểm phần trăm mAP so với YOLOv10n trên DOTA**, kết quả phụ thuộc cấu hình đánh giá.
 - **Liên hệ:** Cho thấy tích hợp CSL vào YOLO không còn là ý tưởng mới riêng biệt.
 
 **3. Rotating-YOLO: A Novel YOLO Model for Remote Sensing Rotating Object Detection (2025)**
-- **Xuất bản:** Zhiguo Liu, Yuqi Chen, Yuan Gao, *Image and Vision Computing*, 154, 105397 (2025). [DOI](https://doi.org/10.1016/j.imavis.2024.105397). Tạp chí **thường được xếp Q1 theo SJR; cần ghi rõ năm và ngành khi trích dẫn chính thức**.
+- **Xuất bản:** Zhiguo Liu, Yuqi Chen, Yuan Gao, *Image and Vision Computing*, 154, 105397 (2025). [DOI](https://doi.org/10.1016/j.imavis.2024.105397). **SJR 2025: Q1** (*Computer Vision and Pattern Recognition*, SJR ≈ 0,881). **JCR 2025: Q2** (*Computer Science, Artificial Intelligence*) **hoặc Q1** (*Computer Science, Software Engineering*), JIF 5,0. [SJR](https://scienceaijournal.com/journals/image-and-vision-computing-0262-8856) · [JCR theo ngành](https://www.akaturk.com/journals/25549?lang=en).
 - **Bài toán:** Phát hiện các đối tượng nhỏ, xoay nhiều hướng với mô hình gọn.
 - **Phương pháp:** Cải tiến YOLOv8; biểu diễn hình học rotated box bằng Gaussian và dùng Gaussian loss, kết hợp fusion/attention.
 - **Kết quả:** Tác giả báo cáo **giảm 33,25% số tham số** và **tăng 1,4 điểm mAP** so với YOLOv8 baseline.
 - **Liên hệ:** Gaussian trên hình học OBB khác Gaussian soft labels cho 24 lớp directed heading của Leanbot.
 
 **4. Detection of Objects in Satellite and Aerial Imagery Using Channel and Spatially Attentive YOLO-CSL for Surveillance (2024)**
-- **Xuất bản:** Divyansh Chaurasia, B. D. K. Patro, *Image and Vision Computing*, 147, 105070 (2024). [DOI](https://doi.org/10.1016/j.imavis.2024.105070). **SJR: Q1 ở một số nhóm ngành/năm; cần xác nhận năm sử dụng**.
+- **Xuất bản:** Divyansh Chaurasia, B. D. K. Patro, *Image and Vision Computing*, 147, 105070 (2024). [DOI](https://doi.org/10.1016/j.imavis.2024.105070). **SJR 2025: Q1** (*Computer Vision and Pattern Recognition*, SJR ≈ 0,881). **JCR 2025: Q2** (*Computer Science, Artificial Intelligence*) **hoặc Q1** (*Computer Science, Software Engineering*), JIF 5,0. [SJR](https://scienceaijournal.com/journals/image-and-vision-computing-0262-8856) · [JCR theo ngành](https://www.akaturk.com/journals/25549?lang=en).
 - **Bài toán:** Oriented object detection trong ảnh vệ tinh/hàng không.
 - **Phương pháp:** YOLOv5 với nhánh góc riêng, Circular Smooth Labels và BCEWithLogits; thêm channel/spatial attention.
 - **Kết quả:** Báo cáo **mAP 57,86 trên DOTA-v2**, so sánh với các detector trên cùng dataset; khoảng **25 triệu tham số, 54 GFLOPs**.
 - **Liên hệ:** Rất gần ở cấp **CSL + YOLO + BCE**, nhưng dự đoán angle branch cho OBB thay vì dùng class heading của Leanbot.
 
 **5. Rotated Object Detection with Circular Gaussian Distribution (2023)**
-- **Xuất bản:** Hang Xu và cộng sự, *Electronics*, 12(15), 3265 (2023). [DOI](https://doi.org/10.3390/electronics12153265). **Quartile SJR/JCR: cần xác minh chính xác theo năm và ngành**.
+- **Xuất bản:** Hang Xu và cộng sự, *Electronics*, 12(15), 3265 (2023). [DOI](https://doi.org/10.3390/electronics12153265). **SJR 2025: Q2** (*Control and Systems Engineering*, SJR ≈ 0,623). **JCR 2025: Q2** (*Engineering, Electrical & Electronic*, JIF 2,9); **Q3** ở *Computer Science, Information Systems* và *Physics, Applied*. [SJR](https://scienceaijournal.com/journals/electronics-2079-9292) · [JCR – MDPI](https://www.mdpi.com/journal/electronics/stats).
 - **Bài toán:** Góc rotated box có tính tuần hoàn và bị gián đoạn gần biên.
 - **Phương pháp:** Circular Gaussian Distribution (CGD), loss theo KL divergence; dựa trên CenterNet-FPN.
 - **Kết quả:** Trên HRSC2016, cấu hình R-50-FPN, **CGD mAP07 90,52 so với CSL 89,98**; với mAP12, **CGD 97,76 so với CSL 95,13**.
 - **Liên hệ:** Gợi ý so sánh huấn luyện phân bố góc với soft-target BCE hiện tại.
 
 **6. Object Detection of Flexible Objects with Arbitrary Orientation Based on Rotation-Adaptive YOLOv5 (2023)**
-- **Xuất bản:** Jiajun Wu và cộng sự, *Sensors*, 23(10), 4925 (2023). [DOI](https://doi.org/10.3390/s23104925). **Quartile phụ thuộc năm/ngành; cần xác minh khi lập bảng chính thức**.
+- **Xuất bản:** Jiajun Wu và cộng sự, *Sensors*, 23(10), 4925 (2023). [DOI](https://doi.org/10.3390/s23104925). **SJR 2025: Q1** (*Instrumentation*, SJR ≈ 0,802; một số ngành khác Q2). **JCR 2025: Q2** (*Instruments & Instrumentation*, JIF 4,0). [SJR](https://scienceaijournal.com/journals/sensors-1424-8220) · [JCR – MDPI](https://www.mdpi.com/journal/sensors/stats).
 - **Bài toán:** Phát hiện vật thể mềm/dài có góc quay bất kỳ.
 - **Phương pháp:** YOLOv5 nhận diện rotated box; mã hóa góc bằng vector Gaussian và tối ưu loss.
 - **Kết quả:** Trên dữ liệu FO của tác giả, mAP **47,7% (YOLOv5s) lên 57,9% (R-YOLOv5s)**; FPS **44,1 xuống 41,9**.
 - **Liên hệ:** Gaussian-coded angle trong YOLO đã có tiền lệ; cần đối chiếu cơ chế 24-class của Leanbot.
 
 **7. Arbitrary-Oriented Object Detection with Circular Smooth Label (2020) — Nghiên cứu nền tảng**
-- **Xuất bản:** Xue Yang, Junchi Yan, *ECCV 2020* (hội nghị; **không áp dụng Q1–Q4 tạp chí**). [DOI](https://doi.org/10.1007/978-3-030-58598-3_40).
+- **Xuất bản:** Xue Yang, Junchi Yan, *ECCV 2020* (hội nghị; **SJR-Journal Q: không áp dụng; JCR-Journal Q: không áp dụng**; cần đánh giá theo xếp hạng hội nghị riêng). [DOI](https://doi.org/10.1007/978-3-030-58598-3_40).
 - **Bài toán:** Khắc phục gián đoạn góc khi oriented bounding box quay qua biên góc.
 - **Phương pháp:** Chuyển hồi quy góc sang classification và dùng Circular Smooth Labels; khảo sát các hàm window, trong đó có Gaussian.
 - **Kết quả:** So sánh với các detector/biểu diễn góc trên DOTA, HRSC2016, ICDAR2015 và MLT.
 - **Liên hệ:** Soft Angular BCE của Leanbot cần được phân biệt rõ với CSL; không nên tự nhận Gaussian circular label là đóng góp mới.
 
 **8. Biternion Nets: Continuous Head Pose Regression from Discrete Training Labels (2015) — Baseline 360°**
-- **Xuất bản:** Lucas Beyer, Alexander Hermans, Bastian Leibe, *GCPR 2015*, LNCS 9358, tr. 157–168 (hội nghị; **không áp dụng Q1–Q4 tạp chí**). [DOI](https://doi.org/10.1007/978-3-319-24947-6_13).
+- **Xuất bản:** Lucas Beyer, Alexander Hermans, Bastian Leibe, *GCPR 2015*, LNCS 9358, tr. 157–168 (hội nghị; **SJR-Journal Q: không áp dụng; JCR-Journal Q: không áp dụng**; cần đánh giá theo xếp hạng hội nghị riêng). [DOI](https://doi.org/10.1007/978-3-319-24947-6_13).
 - **Bài toán:** Ước lượng hướng liên tục 360° từ nhãn góc rời rạc.
 - **Phương pháp:** CNN hồi quy trực tiếp vector \((\cos\theta,\sin\theta)\), tránh gián đoạn 0°/360°.
 - **Kết quả:** Đánh giá với các baseline regression/classification cho hướng đầu; cần đọc bảng metric gốc trước khi chuyển số liệu vào báo cáo.
