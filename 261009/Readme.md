@@ -23,19 +23,20 @@
 - Theo như gợi ý của Thầy hôm qua thì em chia dự án thành các nội dung chính có thể đào sâu để viết bài publication như sau ạ : 
 
 ### 1. Phương pháp xác định góc xuay của vật thể từ camera cố định ứng dụng mô hình Yolo detection 
-- Điểm đóng góp chính : 
+- **Điểm đóng góp chính** : 
     - Đưa ra công thức tính hàm mất mát (Loss function) cho bài toán : Soft Angular BCE Loss . 
         - Mục đích thay thế BCE (Binary Cross Entropy loss) mặc định của YOLO model , vốn chỉ xem mỗi nhãn là độc lập, khôgn có mối quan hệ gì với nhau ( ví dụ Leanbot 0 độ và Leanbot 15 độ được xem là độc lập hoàn toàn không có sự tương đồng nào gần nhau)
         - Tuy nhiên với bài toán xác định góc thì các nhãn có mối quan hệ với nhau ( ví dụ Leanbot 0 độ, nhìn gần giống với Leanbot 15 độ) 
         - Từ các mối quan hệ mờ này ta có thể ước lượng được góc giữa các nhãn gần nhau thông qua cơ chế cộng vector Confidence ( trọng số dự đoán ) của các nhãn. 
 - Phân tích dữ liệu raw của model Yolo trước khi đi qua lớp lọc NMS ( lớp lọc giữ lại dự đoán có confidence cao nhất ) :
     - Dữ liệu trước lớp NMS là dữ liệu thô output trực tiếp từ model, nó chứa toàn bộ trọng số dự đoán của các class góc của Leanbot. Thôgn qua dữ liệu này để tính toán vector tổng hợp trọng số confidence để tính toán ra góc ước lượng 
-- Điểm đóng góp bổ sung : 
+- **Điểm đóng góp bổ sung ( thực nghiệm)** : 
     - Cơ chế thu thập dữ liệu ; đánh nhãn tự động và tự động tạo dataset cho mô hình huấn luyện 
-    - Các cơ chế làm mịn dữ liệu sau khi ước lượng góc : 
+    - Các cơ chế làm mịn dữ liệu thô bị nhiễu sau khi ước lượng góc : 
         - 
 
-
+- **Kết quả khảo sát một số bài báo gần đây như sau :**
+    - 
 ### 2. Toàn bộ hệ thống của bài toán (tính ứng dụng)
 - Tối ưu bài toán cho hệ thống máy chủ tính toán yếu : 
     - Tối giản mô hình : YYOLO11n quantization FP16 , OPenvino runtime ,....
@@ -46,12 +47,8 @@
     - Hệ thống giao tiếp, điều khiển thôgn qua BLE communication với thiết bị chấp hành ( Leanbot )
 
 ## C. Khó khăn
-- 
+- Không
 ## D. Công việc tiếp theo
-
-1. Chuẩn hóa bộ dữ liệu và xây dựng tập kiểm thử với ground truth góc độc lập.
-2. Đo sai số góc tuần hoàn, độ ổn định dự đoán và thời gian inference thực tế.
-3. Bổ sung dữ liệu cho các trường hợp dự đoán lỗi hoặc mất tracking.
-4. Sau khi có kết quả cơ sở, xây dựng thí nghiệm so sánh và xác định hướng phát triển bài báo.
-
-> **Phạm vi báo cáo:** Tổng hợp nội dung đã thực hiện và khó khăn hiện tại; chưa trình bày khảo sát tài liệu, baseline hay kết luận về tính mới của phương pháp.
+- Khảo sát sâu thêm về các bài báo liên quan tới nội dung Orientation Estimation base-on CNN Architecture 
+- Chạy lại thực nghiệm và thu thập dữ liệu với góc quay xác thực để lấy kết quả đánh giá, so sánh với các bài báo đã khảo sát 
+- Em xin phép nhận thêm ý kiến , đề xuất hướng đi tiếp theo ạ .
