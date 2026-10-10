@@ -113,7 +113,7 @@
     - Ước lượng được góc Leanbot đang nhìn thấy 
     - Sử dụng PID điều khiển Leanbot ( có thể sử dụng bộ điều khiển khác và so sánh với PID để đối chứng nếu lựa chọn bộ điều khiển khác .)
     - Hệ thống giao tiếp, điều khiển thôgn qua BLE communication với thiết bị chấp hành ( Leanbot )
-
+> Về phần hệ thống ứng dụng cho bài toán theo như hôm trước Thầy đề xuất là có thể viết bài Confirence ạ, tuy nhiên em vẫn chưa nhìn ra được điểm mới mà mình có thể viết được với hệ thống này ạ, vì đa số đều là những công nghệ và phương pháp đã phổ biến rồi ạ (ví dụ như : bộ điều khiển PID, giao tiếp BLE,.... ) 
 ## C. Khó khăn
 - Sau khi khảo sát kĩ hơn thì em thấy hướng này không phải là hướng mới hoàn toàn, đã có nhiều nghiên cứu trước đó đã áp dụng CNN và một số phương pháp tương đối giống về mặt ý tưởng . 
 - Tuy nhiên mỗi bài báo sẽ có hạn chế riêng , em nghĩ với bài toán đặc thù của Leanbot thì chắc có thể vẫn sẽ tìm được một vài khoảng trống nghiên cứu nào đó để cải tiến những hạn chế cũ ạ.
