@@ -64,7 +64,7 @@
 
 ##### 1. Arbitrary-Oriented Object Detection with Circular Smooth Label — ECCV 2020
 
-- **Thông tin bài báo:** Xue Yang, Junchi Yan; *European Conference on Computer Vision (ECCV 2020)*, LNCS 12353, tr. 677–694. Hội nghị, **không áp dụng Q tạp chí SJR/JCR**. [Trang công bố](https://www.ecva.net/papers/eccv_2020/papers_ECCV/html/666_ECCV_2020_paper.php) · [DOI](https://doi.org/10.1007/978-3-030-58598-3_40).
+- **Thông tin bài báo:** Xue Yang, Junchi Yan; *European Conference on Computer Vision (ECCV 2020)*, LNCS 12353, tr. 677–694. [Trang công bố](https://www.ecva.net/papers/eccv_2020/papers_ECCV/html/666_ECCV_2020_paper.php) · [DOI](https://doi.org/10.1007/978-3-030-58598-3_40).
 - **Bài toán và phương pháp:** Xử lý sự gián đoạn khi hồi quy góc OBB qua biên chu kỳ: thay angle regression bằng **angle classification**, thêm **Circular Smooth Label (CSL)** để các lớp góc lân cận có nhãn mềm tuần hoàn; khảo sát hàm cửa sổ (bao gồm Gaussian) và độ rộng cửa sổ.
 - **Kết quả/đối chứng:** Đánh giá các detector/biểu diễn góc, ảnh hưởng window và radius trên **DOTA, HRSC2016, ICDAR2015, MLT**; chứng minh khả năng khắc phục lỗi biên trong rotated detection. Không báo cáo trực tiếp sai số directed heading 360° cho robot.
 - **So với Leanbot:** **Có:** lớp góc rời rạc, khoảng cách góc tuần hoàn, Gaussian soft targets — rất gần **Soft Angular BCE** mà em sử dụng . **Chưa có đề cập trong bài:** 24 class biểu diễn hướng đầu–đuôi robot 360°, tổng hợp raw class scores trước NMS để suy ra góc liên tục, và thí nghiệm vài trăm ảnh.
@@ -79,7 +79,7 @@
 - **Vai trò sử dụng khi viết báo:** **có thể là lựa chọn trích dẫn cao (prior work sát nhất về YOLO + CSL + BCE)**. Có thể thiết kế **baseline YOLO + angle branch** hoặc, tối thiểu, đối chứng nhãn cứng/nhãn mềm trong cùng YOLO11n. 
 ##### 3. Biternion Nets: Continuous Head Pose Regression from Discrete Training Labels — GCPR 2015
 
-- **Thông tin bài báo:** Lucas Beyer, Alexander Hermans, Bastian Leibe; *German Conference on Pattern Recognition (GCPR 2015)*, LNCS 9358, tr. 157–168. Hội nghị, **không áp dụng Q tạp chí SJR/JCR**. [Trang tác giả và mã nguồn](https://www.vision.rwth-aachen.de/publication/0021/) · [DOI](https://doi.org/10.1007/978-3-319-24947-6_13).
+- **Thông tin bài báo:** Lucas Beyer, Alexander Hermans, Bastian Leibe; *German Conference on Pattern Recognition (GCPR 2015)*, LNCS 9358, tr. 157–168. [Trang tác giả và mã nguồn](https://www.vision.rwth-aachen.de/publication/0021/) · [DOI](https://doi.org/10.1007/978-3-319-24947-6_13).
 - **Bài toán và phương pháp:** Dự đoán **góc hướng liên tục 360°** khi nhãn training chỉ là các góc thô/rời rạc, tránh gián đoạn tại 0°/360°; CNN hồi quy trực tiếp **biternion \((\cos\theta,\sin\theta)\)** thay vì chia góc thành nhiều classes.
 - **Kết quả/đối chứng:** So sánh các mô hình hồi quy/phân loại trên nhiều bộ dữ liệu hướng đầu; báo cáo hiệu quả của biternion từ coarse labels.
 - **So với Leanbot:** **Có:** directed orientation 360°, nhãn góc thưa, đầu ra liên tục, không đòi gán nhãn keypoint. **Khác:** không phải detector YOLO tích hợp class heading và không dùng Soft Angular BCE, pre-NMS scores hay vòng điều khiển Leanbot.
@@ -95,7 +95,7 @@
 
 ##### 5. Rotated Object Detection Using Adaptive Angle Classification and Dynamic Sample Matching — 2026
 
-- **Thông tin bài báo:** Liu Han, Zhou Peng, Yan Han; *Chinese Journal of Engineering*, **48(3)**, 586–598 (2026). **SJR 2025: Q2 (Engineering); JCR 2025: chưa xác nhận được JIF quartile**. [Nhà xuất bản](https://cje.ustb.edu.cn/en/article/doi/10.13374/j.issn2095-9389.2025.06.09.006) · [DOI](https://doi.org/10.13374/j.issn2095-9389.2025.06.09.006).
+- **Thông tin bài báo:** Liu Han, Zhou Peng, Yan Han; *Chinese Journal of Engineering*, **48(3)**, 586–598 (2026). **SJR 2025: Q2 (Engineering); [Nhà xuất bản](https://cje.ustb.edu.cn/en/article/doi/10.13374/j.issn2095-9389.2025.06.09.006) · [DOI](https://doi.org/10.13374/j.issn2095-9389.2025.06.09.006).
 - **Bài toán và phương pháp:** Đối tượng quay trong viễn thám/ký tự công nghiệp; cải tiến YOLOv8 bằng **shape-aware adaptive angle classification (SA-ASL)** với **circular Gaussian window có độ rộng phụ thuộc hình dạng đối tượng** và progressive dynamic matching (hIoU → rIoU).
 - **Kết quả/đối chứng:** **mAP 78,6% trên DOTA**, **92,4% trên tập ký tự công nghiệp**; ablation báo cáo tăng **4,3% ở nhóm lớp nhạy với góc** nhờ angle classification thích nghi (theo tác giả). Không phải thí nghiệm directed heading 360°.
 - **So với Leanbot:** **Có:** nhãn mềm Gaussian tuần hoàn, YOLO, quan tâm độ bất định theo góc. **Khác:** độ rộng nhãn **thích nghi** theo tỷ lệ box thay vì \(\sigma=15^\circ\) cố định; giải góc OBB và ghép mẫu rIoU, không xử lý class heading và circular-mean scores như Leanbot.
