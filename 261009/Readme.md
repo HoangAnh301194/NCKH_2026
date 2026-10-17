@@ -44,8 +44,8 @@
 - Theo như gợi ý của Thầy hôm qua thì em chia dự án thành các nội dung chính có thể đào sâu để viết bài publication như sau ạ : 
 
 ### 1. Phương pháp xác định góc xuay của vật thể từ camera cố định ứng dụng mô hình Yolo detection 
-- **Điểm đóng góp chính** : 
-    - Đưa ra công thức tính hàm mất mát (Loss function) cho bài toán : Soft Angular BCE Loss . 
+- **Thành phần thuật toán hiện tại (cần đối chứng để đánh giá tính mới)** : 
+    - Đã triển khai cơ chế tạo nhãn mềm tuần hoàn Gaussian kết hợp BCE (Soft Angular BCE); nguyên lý có quan hệ trực tiếp với CSL 2020, vì vậy chưa coi công thức này là một loss mới độc lập. 
         - Mục đích thay thế BCE (Binary Cross Entropy loss) mặc định của YOLO model , vốn chỉ xem mỗi nhãn là độc lập, khôgn có mối quan hệ gì với nhau ( ví dụ Leanbot 0 độ và Leanbot 15 độ được xem là độc lập hoàn toàn không có sự tương đồng nào gần nhau)
         - Tuy nhiên với bài toán xác định góc thì các nhãn có mối quan hệ với nhau ( ví dụ Leanbot 0 độ, nhìn gần giống với Leanbot 15 độ) 
         - Từ các mối quan hệ mờ này ta có thể ước lượng được góc giữa các nhãn gần nhau thông qua cơ chế cộng vector Confidence ( trọng số dự đoán ) của các nhãn. 
@@ -104,6 +104,114 @@
 **Kết luận khảo sát sơ bộ:** (1) CSL đã giải quyết **tính tuần hoàn của các lớp góc**; (2) YOLO-CSL chứng minh **YOLO + CSL + BCE không còn là phương pháp mới**; (3) Biternion chứng minh có thể **ước lượng góc liên tục 360° từ nhãn thưa**; (4) YAEN là prior work trực tiếp về **camera monocular + yaw có hướng**; (5) nghiên cứu năm 2026 cho thấy circular soft labels vẫn được cải tiến (adaptive widths). 
 
 **Benchmark có thể thực nghiệm để đánh giá phương pháp đề xuất và phương pháp của các bài báo có thể như sau :** Giữ cùng bộ dữ liệu Leanbot với ground truth góc độc lập và tách train/test theo session: **(A)** YOLO11n + hard-label BCE + argmax; **(B)** YOLO11n + Soft Angular BCE + argmax; **(C)** YOLO11n + Soft Angular BCE + weighted circular mean; **(D)** sin/cos regression (Biternion baseline). Báo cáo **circular MAE**, lỗi tại biên 0°/360°, latency; thêm ablation $\sigma$ khi có kết quả nền. Không so trực tiếp chỉ số từ các bộ dữ liệu/phần cứng khác nhau.
+
+#### Đối chiếu chuyên sâu: CSL và phương pháp Leanbot (định hướng publication)
+
+**Nguồn đối chiếu trực tiếp:** [CSL — ECCV 2020](https://www.ecva.net/papers/eccv_2020/papers_ECCV/html/666_ECCV_2020_paper.php) ([PDF](https://www.ecva.net/papers/eccv_2020/papers_ECCV/papers/123530664.pdf)); [bản mở rộng của chính tác giả — IJCV 2022](https://doi.org/10.1007/s11263-022-01593-w) ([bản thảo](https://arxiv.org/pdf/2003.05597)); [YOLO-CSL — Image and Vision Computing 2024](https://doi.org/10.1016/j.imavis.2024.105070). Mã Leanbot đang đối chiếu: [notebook huấn luyện SoftBCE](https://github.com/HoangAnh301194/Leanbot_orientation_estimation-CNN_base/blob/master/Leanbot_Camera_AI_Control_FINAL/tools/Leanbot_Train_SoftBCE.ipynb), [phân tích score trước NMS](https://github.com/HoangAnh301194/Leanbot_orientation_estimation-CNN_base/blob/master/Leanbot_Camera_AI_Control_FINAL/tools/check_confidence.py).
+
+##### (a) Vấn đề học thuật: giống nhau ở đâu?
+
+- **Cả hai đều chuyển góc thành phân loại trên vòng tròn**, dùng khoảng cách góc có tính chu kỳ và tăng mức tương đồng của những lớp góc gần nhau. Vì vậy, không thể coi ý tưởng **Gaussian circular soft labels** là mới của Leanbot.
+- **CSL 2020:** Dự đoán góc của *rotated bounding box* (OBB) bằng một nhánh **angle classification**; góc được mã hóa bởi các bin góc và nhãn cửa sổ tuần hoàn. Nhóm tác giả khảo sát cửa sổ pulse/rectangular/triangular/Gaussian; hàm mất mát nhánh góc có thể là sigmoid cross-entropy hoặc focal loss tùy detector, **không đơn thuần là một “loss Gaussian” mới**. Miền góc OBB theo quy ước bài báo thường là 180°, còn độ phân giải bin có thể rất nhỏ, ví dụ 1°.
+- **Leanbot:** Có 24 lớp theo chu kỳ 360°, mỗi lớp cách 15°. Nhãn mềm Gaussian được áp vào **classification targets của chính YOLO11n detection head**, thay vì huấn luyện một nhánh angle classification độc lập. Đây là **khác biệt cách tích hợp/kiến trúc**, chưa phải bằng chứng tự thân về tính mới hoặc độ chính xác tốt hơn.
+
+##### (b) Đối chiếu cơ chế tạo nhãn và loss
+
+Với CSL, biểu diễn tổng quát có dạng:
+
+\[
+y_j^{CSL}=g\big(d_T(\theta_{gt},\theta_j)\big),\quad
+d_T(a,b)=\min(|a-b|,T-|a-b|),
+\]
+
+trong đó \(T\) là chu kỳ của góc OBB theo quy ước, còn \(g\) là hàm cửa sổ. Trong thiết kế CSL gốc, cửa sổ có **bán kính hữu hạn** \(r\): ngoài cửa sổ, mục tiêu bằng 0. Trường hợp Gaussian là **một lựa chọn** của CSL, không phải toàn bộ CSL chỉ gồm Gaussian.
+
+Trong notebook Leanbot hiện tại:
+
+\[
+y_{ij}^{LB}=a_i\exp\left[-\frac{d_{360}(\theta_i,\theta_j)^2}{2\sigma^2}\right],
+\qquad \sigma=15^\circ.
+\]
+
+- \(\theta_i\) là góc đại diện lớp được gán cho positive sample \(i\); \(\theta_j=15^\circ j\), \(j=0,\ldots,23\).
+- \(a_i\) là **trọng số target score từ cơ chế gán mẫu của YOLO** (trong code biến đặt tên là \`original_iou_scores\`, nhưng không nên đồng nhất nó với IoU thuần túy).
+- Notebook nhân Gaussian với \(a_i\), sau đó chuyển tới BCE gốc của YOLO. Những anchor/background không được gán vẫn giữ target 0.
+- Gaussian trong code **không cắt bởi bán kính hữu hạn** như dạng CSL có ngưỡng cửa sổ; các phần tử xa vẫn có giá trị rất nhỏ, thay vì bị gán chính xác bằng 0.
+- BCE và cấu trúc 24-class cùng nằm trong **detection classification head**; bản CSL chuẩn thông thường phân biệt **object class** và **angle bins** bằng các nhánh riêng.
+
+**Nhận xét về novelty:** Nhân nhãn Gaussian với target score YOLO là một chi tiết tích hợp có thể khảo sát, nhưng muốn xem là đóng góp thì phải đối chứng với *hard target có trọng số*, *CSL Gaussian độc lập* và *nhánh dự đoán góc riêng*, đồng thời giải thích lợi ích lý thuyết. Không nên gọi Soft Angular BCE hiện tại là một loss hoàn toàn mới.
+
+##### (c) Bảng phân biệt trọng tâm giữa CSL và Leanbot
+
+| Tiêu chí | CSL gốc — ECCV 2020 | Leanbot hiện tại | Ý nghĩa nghiên cứu |
+|---|---|---|---|
+| Bài toán đầu ra | Góc OBB kết hợp rotated detection | Hướng đầu–đuôi robot **360°**, bbox ngang | Khác mục tiêu; không đồng nghĩa đã mới, xem thêm OHDet 2022 |
+| Cách đặt nhãn | Class góc + cửa sổ làm mềm tuần hoàn | 24 detection classes đồng thời mã hóa hướng | Khác cách tổ chức đầu ra, cần so với angle head độc lập |
+| Gaussian target | Có trong CSL (một trong nhiều cửa sổ) | Có, \(\sigma=15^\circ\) cố định | **Trùng nguyên lý**, không đủ để khẳng định novelty |
+| Vai trò loss | Loss riêng cho góc + loss object class và box | Thay mục tiêu BCE của YOLO class head | Cần ablation về chất lượng detection/heading |
+| Trọng số gán mẫu | Gắn với cách chọn positive anchors của detector gốc | Target score \(a_i\) từ YOLO task-aligned assignment | Cần tách hiệu quả do tích hợp với YOLO khỏi hiệu quả CSL |
+| Giải mã góc | CSL gốc giải mã bin có score lớn nhất (argmax), độ phân giải phụ thuộc bin | Tổng vector có trọng số từ **24 scores** rồi lấy atan2 | Hướng khảo sát *continuous decoding*, nhưng không mặc nhiên là mới |
+| Nguồn dữ liệu khi suy luận | Nhánh angle classification của detector | Đọc toàn bộ class scores của candidate; có phân tích **pre-NMS / nhiều candidates theo IoU** | Có cơ hội nghiên cứu phân bố và hợp nhất score |
+| Thực nghiệm gốc | DOTA/HRSC2016/scene text, chủ yếu báo cáo rotated detection mAP | Leanbot: hiện có dataset 204 ảnh theo tài liệu; chưa có benchmark circular MAE độc lập đầy đủ | Phải thiết kế phép đo mới, không so mAP OBB với MAE heading |
+
+**Đính chính quan trọng:** [IJCV 2022 — *Classification Based Approaches Revisited*](https://doi.org/10.1007/s11263-022-01593-w) là **bản mở rộng liên quan trực tiếp** của nhóm CSL. Công trình này đã bổ sung (1) *Densely Coded Labels* để giảm số chiều biểu diễn góc; (2) **angle fine-tuning**, với một đầu ra hồi quy phần dư trong mỗi bin nhằm cải thiện độ chính xác dưới mức lượng tử hóa; và (3) **OHDet (Object Heading Detection)**, dự đoán hướng đầu vật thể thông qua góc OBB kết hợp phân loại vị trí đầu theo **bốn hướng/cạnh**. Vì vậy **không được khẳng định “CSL chưa từng xử lý heading 360°” hay “chưa từng giải góc chính xác hơn độ rộng bin”**. Phần cần phân biệt là **cấu trúc heading 24-class trực tiếp, chiến lược giải mã theo scores và bối cảnh robot/camera cố định**, chứ không phải sự tồn tại của heading 360°.
+
+##### (d) Sự khác nhau ở giai đoạn giải mã góc — câu hỏi nghiên cứu có triển vọng
+
+Trong \`check_confidence.py\`, mỗi candidate \(i\) có 24 class scores \(s_{ij}\). Phương pháp Leanbot suy ra:
+
+\[
+C_i=\sum_{j=0}^{23}s_{ij}\cos\theta_j,\quad
+S_i=\sum_{j=0}^{23}s_{ij}\sin\theta_j,\quad
+\hat\theta_i=\operatorname{atan2}(S_i,C_i).
+\]
+
+CSL gốc thông thường chọn **bin có score lớn nhất** rồi chuyển bin thành góc rời rạc. Leanbot có thể cho ra giá trị nằm giữa hai bin 15°, ví dụ hai lớp lân cận có scores cùng cao. Tuy nhiên **góc liên tục về mặt công thức không bảo đảm là góc thực chính xác**, vì scores có thể chưa được hiệu chuẩn, có nhiều đỉnh hoặc bị thiên lệch bởi quá trình training.
+
+Code Leanbot còn chọn các candidate trước NMS theo max class score, nhóm các box giao nhau theo IoU (ngưỡng mặc định 0,7 trong script khảo sát), rồi cộng vector hướng có trọng số để ước lượng góc nhóm. Đây là **phần triển khai đáng nghiên cứu**, nhưng phải xác minh độ lợi so với chỉ dùng score vector của **một candidate** và so với hậu xử lý thông thường; nhiều candidate trùng lặp cũng có thể khuếch đại cùng một sai số.
+
+Một chỉ số cần đưa vào kiểm thử là độ tập trung vector chuẩn hóa:
+
+\[
+R_i=\frac{\sqrt{C_i^2+S_i^2}}{\sum_j s_{ij}},\qquad
+0\le R_i\le1 \quad (\sum_j s_{ij}>0).
+\]
+
+\(R_i\) **không phải xác suất đúng**. Nó chỉ phản ánh mức tập trung hướng của các scores không âm; cần đánh giá khả năng dự báo sai số bằng dữ liệu ground truth độc lập. Phải quy định xử lý trường hợp \(\sum s_{ij}\approx0\) hoặc \(\sqrt{C_i^2+S_i^2}\approx0\) (góc suy ra không ổn định).
+
+##### (e) Khoảng trống cần kiểm chứng, không tự nhận là đóng góp đã được chứng minh
+
+**Giả thuyết H1 — Học từ nhãn thưa:** Với cùng YOLO11n và dữ liệu huấn luyện 24 góc cách nhau 15°, circular soft-label BCE có thể cải thiện circular MAE so với hard-label BCE ở **các góc trung gian không xuất hiện trong train** hay không?
+
+**Giả thuyết H2 — Giải mã liên tục:** Với **cùng model weights**, liệu circular mean trên toàn bộ scores cải thiện độ chính xác, đặc biệt gần biên 0°/360°, so với argmax và nội suy cục bộ không? So sánh này phải cố định model để tách ảnh hưởng của decoder khỏi loss.
+
+**Giả thuyết H3 — Nhiều detection candidates:** Liệu hợp nhất các candidate có IoU cao làm giảm sai số và tăng ổn định theo điều kiện che khuất/nhiễu, hay gây lệch vì dự đoán tương quan?
+
+**Giả thuyết H4 — Dữ liệu ít:** Các lợi ích trên có nhất quán khi giảm số session training và khi thay đổi ánh sáng, góc camera, kích thước ROI không? Không kết luận data-efficient chỉ từ việc train được bằng 204 ảnh.
+
+##### (f) Ma trận đối chứng tối thiểu trước publication
+
+| ID | Huấn luyện | Decoder / postprocessing | Kiểm tra |
+|---|---|---|---|
+| A | YOLO11n hard BCE | Argmax | Mốc chuẩn |
+| B | YOLO11n hard BCE | Circular mean | Tác dụng decoder **không có soft labels** |
+| C | YOLO11n Gaussian Soft BCE | Argmax | Tác dụng riêng của supervision |
+| D | **Cùng weights mô hình C** | Circular mean (một candidate) | Tác dụng riêng của circular mean |
+| E | **Cùng weights mô hình C** | Nội suy góc từ scores lân cận cực đại | Baseline giải mã liên tục khác |
+| F | **Cùng weights mô hình C** | Circular mean + nhóm candidates pre-NMS | Tác dụng riêng của fusion |
+| G (mở rộng) | YOLO có **angle head riêng + CSL** | Argmax / fine-tuning | Đối thủ kiến trúc sát CSL/YOLO-CSL |
+| H (mở rộng) | CNN/YOLO + **sin/cos regression** | Atan2 | Đối thủ Biternion |
+
+**Đo lường bắt buộc:** circular MAE/median/P90 (độ), lỗi khu vực biên 0°/360°, lỗi tại các góc **không trùng bội số 15°**, tỷ lệ trong ngưỡng 5°/10°/15°, mAP phát hiện robot, thời gian suy luận trên **cùng phần cứng**. Đánh giá nhiều seed và báo cáo độ phân tán nếu điều kiện cho phép. Với nhánh F, thêm hiệu quả của ngưỡng IoU, số candidates và chi phí hậu xử lý; với loss C, thử \(\sigma=7{,}5^\circ,15^\circ,22{,}5^\circ,30^\circ\).
+
+**Thiết kế ground truth:** Cần tạo tập test có **góc đo độc lập** với class labels; dùng session thử nghiệm riêng, tránh ảnh gần trùng bị chia ngẫu nhiên giữa train/test. Phải xác lập góc theo **hệ tọa độ sa bàn** và kiểm tra phép biến đổi phối cảnh do camera đặt chéo; **góc quay biểu kiến trên pixel chưa chắc bằng yaw trên mặt phẳng thực**.
+
+**Rà soát mã nguồn trước chạy ablation:** Notebook hiện chia train/val/test ngẫu nhiên theo **ảnh trong từng class**, có nguy cơ rò rỉ giữa các ảnh cùng session. Tham số \`degrees=10.0\` của augmentation có thể xoay ảnh nhưng **không cập nhật nhãn class góc tương ứng**; cần tắt hoặc thiết kế biến đổi nhãn/hình học phù hợp trước khi tạo kết quả khoa học.
+
+**Phát biểu research gap tạm thời:** *Chưa có bằng chứng từ các công trình được đối chiếu ở đây rằng một YOLO detector mã hóa trực tiếp 24 directed-heading classes, huấn luyện bằng circular soft targets dưới điều kiện ít dữ liệu, và giải mã/hợp nhất toàn bộ class scores sẽ vượt các baseline về **continuous 360° robot heading** từ camera cố định nhìn chéo.* Đây là **giả thuyết cần thực nghiệm chứng minh**, không phải khẳng định chưa từng có công bố tương tự trong toàn bộ tài liệu học thuật.
+
+**Điểm mới cần chứng minh được trước khi viết bài:** Giải mã góc tin cậy hơn hoặc một cơ chế giám sát/hợp nhất được thiết kế khác biệt, kèm phân tích toán học, ablation tách từng thành phần, và kết quả tốt hơn phương pháp đã biết trên cùng protocol. Nếu chỉ Gaussian Soft BCE vượt hard BCE thì đó chủ yếu là **ứng dụng lại ý tưởng CSL**.
+
 
 ### 2. Toàn bộ hệ thống của bài toán (tính ứng dụng)
 - Tối ưu bài toán cho hệ thống máy chủ tính toán yếu : 
