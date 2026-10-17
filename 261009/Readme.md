@@ -134,7 +134,7 @@ y_{ij}^{LB}=a_i\exp\left[-\frac{d_{360}(\theta_i,\theta_j)^2}{2\sigma^2}\right],
 \]
 
 - \(\theta_i\) là góc đại diện lớp được gán cho positive sample \(i\); \(\theta_j=15^\circ j\), \(j=0,\ldots,23\).
-- \(a_i\) là **trọng số target score từ cơ chế gán mẫu của YOLO** (trong code biến đặt tên là \`original_iou_scores\`, nhưng không nên đồng nhất nó với IoU thuần túy).
+- \(a_i\) là **trọng số target score từ cơ chế gán mẫu của YOLO** (trong code biến đặt tên là `original_iou_scores`, nhưng không nên đồng nhất nó với IoU thuần túy).
 - Notebook nhân Gaussian với \(a_i\), sau đó chuyển tới BCE gốc của YOLO. Những anchor/background không được gán vẫn giữ target 0.
 - Gaussian trong code **không cắt bởi bán kính hữu hạn** như dạng CSL có ngưỡng cửa sổ; các phần tử xa vẫn có giá trị rất nhỏ, thay vì bị gán chính xác bằng 0.
 - BCE và cấu trúc 24-class cùng nằm trong **detection classification head**; bản CSL chuẩn thông thường phân biệt **object class** và **angle bins** bằng các nhánh riêng.
@@ -158,7 +158,7 @@ y_{ij}^{LB}=a_i\exp\left[-\frac{d_{360}(\theta_i,\theta_j)^2}{2\sigma^2}\right],
 
 ##### (d) Sự khác nhau ở giai đoạn giải mã góc — câu hỏi nghiên cứu có triển vọng
 
-Trong \`check_confidence.py\`, mỗi candidate \(i\) có 24 class scores \(s_{ij}\). Phương pháp Leanbot suy ra:
+Trong `check_confidence.py`, mỗi candidate \(i\) có 24 class scores \(s_{ij}\). Phương pháp Leanbot suy ra:
 
 \[
 C_i=\sum_{j=0}^{23}s_{ij}\cos\theta_j,\quad
@@ -206,7 +206,7 @@ R_i=\frac{\sqrt{C_i^2+S_i^2}}{\sum_j s_{ij}},\qquad
 
 **Thiết kế ground truth:** Cần tạo tập test có **góc đo độc lập** với class labels; dùng session thử nghiệm riêng, tránh ảnh gần trùng bị chia ngẫu nhiên giữa train/test. Phải xác lập góc theo **hệ tọa độ sa bàn** và kiểm tra phép biến đổi phối cảnh do camera đặt chéo; **góc quay biểu kiến trên pixel chưa chắc bằng yaw trên mặt phẳng thực**.
 
-**Rà soát mã nguồn trước chạy ablation:** Notebook hiện chia train/val/test ngẫu nhiên theo **ảnh trong từng class**, có nguy cơ rò rỉ giữa các ảnh cùng session. Tham số \`degrees=10.0\` của augmentation có thể xoay ảnh nhưng **không cập nhật nhãn class góc tương ứng**; cần tắt hoặc thiết kế biến đổi nhãn/hình học phù hợp trước khi tạo kết quả khoa học.
+**Rà soát mã nguồn trước chạy ablation:** Notebook hiện chia train/val/test ngẫu nhiên theo **ảnh trong từng class**, có nguy cơ rò rỉ giữa các ảnh cùng session. Tham số `degrees=10.0` của augmentation có thể xoay ảnh nhưng **không cập nhật nhãn class góc tương ứng**; cần tắt hoặc thiết kế biến đổi nhãn/hình học phù hợp trước khi tạo kết quả khoa học.
 
 **Phát biểu research gap tạm thời:** *Chưa có bằng chứng từ các công trình được đối chiếu ở đây rằng một YOLO detector mã hóa trực tiếp 24 directed-heading classes, huấn luyện bằng circular soft targets dưới điều kiện ít dữ liệu, và giải mã/hợp nhất toàn bộ class scores sẽ vượt các baseline về **continuous 360° robot heading** từ camera cố định nhìn chéo.* Đây là **giả thuyết cần thực nghiệm chứng minh**, không phải khẳng định chưa từng có công bố tương tự trong toàn bộ tài liệu học thuật.
 
