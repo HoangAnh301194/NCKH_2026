@@ -1,5 +1,8 @@
 # Báo cáo nghiên cứu ngày 17/10/2026
 
+**Bản dịch tiếng Việt và hình minh họa bài IJCV 2022:** [BAN_DICH_IJCV_2022_TIEN_G_VIET.md](./BAN_DICH_IJCV_2022_TIEN_G_VIET.md) — giữ bố cục các mục 1–5, công thức và số liệu chính; hình gốc từ repository tác giả.
+
+
 ## A. Công việc đã làm
 
 ### 1. Khảo sát nội dung và đóng góp của bài báo IJCV 2022
