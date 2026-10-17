@@ -1,12 +1,9 @@
 # Báo cáo nghiên cứu ngày 17/10/2026
 
-**Trọng tâm:** Đọc sâu bài báo *On the Arbitrary-Oriented Object Detection: Classification Based Approaches Revisited* (Yang & Yan, IJCV 2022) và tìm điểm giống, khác biệt, giới hạn giữa CSL/OHDet với phương pháp Leanbot.
-
-**Nguồn:** [PDF bài báo đã lưu trong thư mục này](./2003.05597v4.pdf) · [IJCV 2022, DOI](https://doi.org/10.1007/s11263-022-01593-w) · [arXiv v4](https://arxiv.org/abs/2003.05597) · [Repository Leanbot](https://github.com/HoangAnh301194/Leanbot_orientation_estimation-CNN_base). Bản IJCV 2022 là nghiên cứu mở rộng các kết quả CSL (ECCV 2020) và DCL (CVPR 2021); **không được coi các kỹ thuật này là những công trình không liên quan**.
-
 ## A. Công việc đã làm
 
 ### 1. Khảo sát nội dung và đóng góp của bài báo IJCV 2022
+**Bài báo** :  [On the Arbitrary-Oriented Object Detection: Classification Based Approaches Revisited, Yang & Yan, IJCV 2022](./2003.05597v4.pdf)
 
 **Bài toán:** Hồi quy góc hộp giới hạn xoay (*oriented bounding box*, OBB) có thể tạo ra lỗi gián đoạn gần biên miền góc hoặc khi đổi thứ tự cạnh/đỉnh. Các tác giả chuyển dự đoán góc thành bài toán phân loại các khoảng góc; các lớp góc phải giữ tính tuần hoàn.
 
@@ -18,9 +15,9 @@
 - **Object Heading Detector (OHDet) — Mục 3.7:** Thay vì chỉ dùng OBB, tác giả thêm một nhánh **phân loại bốn vị trí/cạnh của đầu vật thể** để xác định hướng đầu–đuôi tàu, máy bay và phương tiện. Có dataset **OHD-SJTU**. Vì vậy **directed heading đã được nghiên cứu trong chính họ công trình CSL**.
 - **Thực nghiệm — Mục 4:** Báo cáo mAP rotated detection và các chỉ số **OBB mAP, OHD mAP, Head Accuracy**. Trong Mục 4.4, Head Accuracy tại cột IoU50:95 là khoảng **94,25%** (OHD-SJTU-S) và **64,12%** (OHD-SJTU-L). Các con số này **không phải circular MAE** và không được dùng so sánh trực tiếp với sai số góc Leanbot.
 
-### 2. So sánh trực tiếp với phương pháp Leanbot
+### 2. So sánh trực tiếp với phương pháp ứng dụng cho Leanbot
 
-| Nội dung | CSL / DCL / OHDet trong IJCV 2022 | Leanbot hiện tại | Nhận xét về đóng góp |
+| Nội dung | CSL / DCL / OHDet trong IJCV 2022 | Bài toán ứng dụng cho Leanbot hiện tại | Nhận xét về đóng góp |
 |---|---|---|---|
 | Bài toán | Phát hiện vật thể với OBB; OHDet thêm hướng đầu vật thể | Phát hiện Leanbot bằng hộp ngang và suy ra heading 360° | Khác mục tiêu và cách biểu diễn, **không chứng minh tính mới** |
 | Kiến trúc | Object class, OBB angle và heading được tổ chức thành các đầu ra/nhánh riêng | YOLO11n dùng **24 detection classes** chính là 24 nhãn hướng, không có angle head độc lập | Khác cách tích hợp head; cần baseline cùng backbone |
@@ -33,8 +30,6 @@
 | Trước/sau NMS | Detector có chọn/lọc candidate nhưng không phải cơ chế tổng hợp vector đang triển khai ở Leanbot | Có phân tích raw pre-NMS, gom các candidate IoU cao rồi hợp nhất góc | Hướng kiểm chứng tiềm năng; chưa thể khẳng định mới |
 | Thước đo | OBB/OHD mAP và Head Accuracy | Cần **circular MAE/median/P90** theo góc thực, đồng thời detection accuracy và latency | Không so trực tiếp kết quả từ các dataset khác nhau |
 
-**Kết luận bước đầu:** Sự khác biệt rõ nhất của Leanbot nằm ở **kiến trúc 24-class directed-heading tích hợp vào detection head** và **cách tổng hợp class scores để ước lượng góc liên tục**, không nằm ở việc tạo Gaussian circular labels. Những khác biệt này hiện là các **giả thuyết về hiệu quả**, chưa phải đóng góp khoa học đã được kiểm chứng.
-
 ### 3. Đối chiếu công thức toán học và mã nguồn thực tế
 
 **3.1. CSL trong bài báo (Mục 3.4)**
@@ -43,7 +38,6 @@ CSL xây dựng nhãn bằng hàm cửa sổ có bán kính `r`, tuần hoàn th
 
 **3.2. Soft Angular BCE trong Leanbot**
 
-Trong [notebook huấn luyện](https://github.com/HoangAnh301194/Leanbot_orientation_estimation-CNN_base/blob/master/Leanbot_Camera_AI_Control_FINAL/tools/Leanbot_Train_SoftBCE.ipynb), đối với positive sample `i` và class góc `j`:
 
 $$
 d_{ij}=\min\left(|\theta_i-\theta_j|,\;360^\circ-|\theta_i-\theta_j|\right)
@@ -54,13 +48,9 @@ y_{ij}^{LB}=a_i\exp\left(-\frac{d_{ij}^{2}}{2\sigma^2}\right),
 \quad \theta_j=15^\circ j,\quad j=0,\ldots,23,\quad \sigma=15^\circ.
 $$
 
-Trong đó `a_i` là **trọng số target score do cơ chế gán mẫu của YOLO tạo ra**; biến `original_iou_scores` trong code không có nghĩa đây chỉ là IoU thuần túy. Gaussian được nhân với `a_i` rồi truyền cho BCE classification loss; mẫu nền vẫn giữ targets bằng 0. Khác với định nghĩa CSL có cửa sổ hữu hạn, Gaussian trong code hiện tại **không bị cắt theo bán kính** (các bin xa nhận target rất nhỏ, không chính xác bằng 0).
-
-=> **Đánh giá:** Đây là cách triển khai **circular soft-label supervision trong YOLO detection classification head**. Không đủ căn cứ gọi là một loss mới nếu chưa có lý thuyết khác biệt và thí nghiệm chứng minh.
+Trong đó `a_i` là **trọng số target score do cơ chế gán mẫu của YOLO tạo ra**. Gaussian được nhân với `a_i` rồi truyền cho BCE classification loss; mẫu nền vẫn giữ targets bằng 0. Khác với định nghĩa CSL có cửa sổ hữu hạn, Gaussian trong code hiện tại **không bị cắt theo bán kính** (các bin xa nhận target rất nhỏ, không chính xác bằng 0).
 
 **3.3. Weighted Circular Mean — giai đoạn suy luận, không phải loss**
-
-Theo [`check_confidence.py`](https://github.com/HoangAnh301194/Leanbot_orientation_estimation-CNN_base/blob/master/Leanbot_Camera_AI_Control_FINAL/tools/check_confidence.py):
 
 $$
 C_i=\sum_{j=0}^{23}s_{ij}\cos\theta_j,\quad
